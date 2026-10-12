@@ -1,0 +1,69 @@
+from matplotlib import pyplot as plt
+from matplotlib import pylab
+from termcolor import colored
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+import matplotlib.colors as mcolors
+import matplotlib as mpl
+from matplotlib import cm
+from matplotlib.colors import LinearSegmentedColormap
+import matplotlib.patches as mpatches
+
+
+
+ex_hist = pd.ExcelFile("/content/sample_data/MAC SA_CAPEX -15%.xlsx")
+df = ex_hist.parse("MAC")
+print(df)
+df = df[df.Measure != '-']
+larghezza=df['CO2 abatement 2020'].tolist()
+
+
+yy=df['C_effectiveness'].tolist()
+cc=df['Measure'].tolist()
+df['xcum']=df['CO2 abatement 2020'].cumsum()
+df['xcum2']=[0]+df['xcum'].tolist()[:-1]
+
+xx=df['xcum2'].tolist()
+
+
+fig, ax = plt.subplots(figsize=(8,6))
+plt.rcParams["font.family"] = "Arial"
+
+dic_col={'Scenario_Ideal': 'bisque', 'Scenario_E': 'lawngreen', 'Scenario_F':'lightblue', 'Scenario_C': 'magenta', 'Scenario_D':'orange', 'Scenario_B':'yellow','Scenario_A':'deeppink'}
+
+col=[]
+for a in range(len(cc)):
+  col.append(dic_col[cc[a]])
+
+
+plt.bar(xx, yy, width=larghezza,  align='edge', color=col, edgecolor='black', linewidth=0.8)
+
+PV_patch1 = mpatches.Patch(facecolor='bisque', edgecolor='black', label='Scenario_Ideal')
+
+PV_patch2 = mpatches.Patch(facecolor='lawngreen', edgecolor='black', label='Scenario_E')
+
+PV_patch3 = mpatches.Patch(facecolor='lightblue', edgecolor='black', label='Scenario_F')
+
+PV_patch4 = mpatches.Patch(facecolor='magenta', edgecolor='black',label='Scenario_C')
+
+PV_patch5 = mpatches.Patch(facecolor='orange', edgecolor='black',label='Scenario_D')
+
+PV_patch6 = mpatches.Patch(facecolor='yellow', edgecolor='black',label='Scenario_B')
+
+PV_patch7 = mpatches.Patch(facecolor='deeppink', edgecolor='black',label='Scenario_A')
+
+
+plt.legend(handles=[PV_patch1,  PV_patch2, PV_patch3, PV_patch4, PV_patch5, PV_patch6, PV_patch7], loc=2, fontsize=10,)
+
+bars = plt.bar(xx, yy, width=larghezza, align='edge', color=col, edgecolor='k', linewidth=0.8)
+for bar, value in zip(bars, yy):
+    plt.text(bar.get_x() + bar.get_width() / 2, bar.get_height(), str(value),fontsize=7, fontweight='bold', ha='center', va='bottom')
+
+plt.ylim(-180, 300)
+plt.ylabel('Marginal Abatement Cost [USD/t avoided $\mathregular{CO_2eq}$]', fontsize=10, fontweight='bold')
+plt.xlabel('[Mt $\mathregular{CO_2eq}$]', fontsize=10, fontweight='bold')
+plt.grid(linestyle='dotted')
+plt.show()
+
+pylab.savefig("MAC.png", bbox_inches="tight", dpi=1000)
